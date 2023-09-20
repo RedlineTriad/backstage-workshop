@@ -1,0 +1,38 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: my-custom-template
+  title: My cool template
+  description: Description that probably no one cares about.
+spec:
+  owner: user:guest
+  type: service
+
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters:
+    - title: Fill in some steps
+      required:
+        - firstname
+        - lastname
+      properties:
+        firstname:
+          title: Name
+          type: string
+          description: Your given name
+
+        lastname:
+          title: Surname
+          type: string
+          description: You family name
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: print-stuff
+      name: Say hi
+      action: debug:log
+      input:
+        message: "Hello, ${{parameters.firstname}} ${{parameters.lastname}}"

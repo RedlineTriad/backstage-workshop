@@ -1,9 +1,9 @@
 app:
   title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
+  baseUrl: http://${PUBLIC_DNS}:3000
 
 organization:
-  name: My Company
+  name: SwissPost CH
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -12,24 +12,28 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl: http://localhost:7007
+  baseUrl: http://${PUBLIC_DNS}:7007
   listen:
     port: 7007
     # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
+    host: 0.0.0.0
   csp:
     connect-src: ["'self'", 'http:', 'https:']
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: http://localhost:3000
+    origin: http://${PUBLIC_DNS}:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   database:
-    client: better-sqlite3
-    connection: ':memory:'
+    client: pg
+    connection:
+      host: localhost
+      port: 5432
+      user: postgres
+      password: stagecentral
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
@@ -63,8 +67,12 @@ techdocs:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
-  # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers: {}
+  environment: development
+  providers:
+    github:
+      development:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
@@ -83,6 +91,24 @@ catalog:
     # Local example template
     - type: file
       target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Local example template
+    - type: file
+      target: ../../examples/template/template1.yaml
+      rules:
+        - allow: [Template]
+
+    # Local example template
+    - type: file
+      target: ../../examples/template/templating-template.yaml
+      rules:
+        - allow: [Template]
+
+    # Local example template
+    - type: url
+      target: https://github.com/RedlineTriad/bs-templates/blob/master/templates.yaml
       rules:
         - allow: [Template]
 
